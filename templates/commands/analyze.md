@@ -1,5 +1,5 @@
 ---
-description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation.
+description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation, including quantitative metrics validation for success criteria.
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
   ps: scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
@@ -16,6 +16,8 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Goal
 
 Identify inconsistencies, duplications, ambiguities, and underspecified items across the three core artifacts (`spec.md`, `plan.md`, `tasks.md`) before implementation. This command MUST run only after `/speckit.tasks` has successfully produced a complete `tasks.md`.
+
+The analysis includes validation of success criteria to ensure they include proper quantitative metrics (time, performance, volume) and qualitative measures (user satisfaction, task completion), while remaining technology-agnostic and user-focused.
 
 ## Operating Constraints
 
@@ -46,6 +48,7 @@ Load only the minimal necessary context from each artifact:
 - Functional Requirements
 - Non-Functional Requirements
 - User Stories
+- Success Criteria
 - Edge Cases (if present)
 
 **From plan.md:**
@@ -73,6 +76,7 @@ Create internal representations (do not include raw artifacts in output):
 
 - **Requirements inventory**: Each functional + non-functional requirement with a stable key (derive slug based on imperative phrase; e.g., "User can upload file" → `user-can-upload-file`)
 - **User story/action inventory**: Discrete user actions with acceptance criteria
+- **Success criteria inventory**: Extract all success criteria with their measurable outcomes
 - **Task coverage mapping**: Map each task to one or more requirements or stories (inference by keyword / explicit reference patterns like IDs or key phrases)
 - **Constitution rule set**: Extract principle names and MUST/SHOULD normative statements
 
@@ -114,14 +118,44 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - Task ordering contradictions (e.g., integration tasks before foundational setup tasks without dependency note)
 - Conflicting requirements (e.g., one requires Next.js while other specifies Vue)
 
+#### G. Quantitative Metrics Validation
+
+Validate success criteria for proper quantitative analysis:
+
+- **Missing Measurements**: Success criteria lacking specific quantitative metrics (numbers, percentages, time values, counts)
+  - Flag criteria with vague terms: "fast", "quickly", "efficiently", "many", "few", "some"
+  - Flag criteria missing numeric thresholds: "better performance", "improved user experience"
+  
+- **Technology Leakage**: Success criteria mentioning implementation details
+  - Flag technology-specific metrics: API response times, database TPS, framework-specific measures
+  - Flag infrastructure references: server names, service endpoints, cache hit rates
+  - Recommend user-facing metric alternatives
+  
+- **Unverifiable Criteria**: Success criteria that cannot be objectively tested
+  - Flag subjective statements without measurement methods: "users will be happy", "system is intuitive"
+  - Flag criteria missing verification approach: no mention of how to measure the outcome
+  
+- **Missing Quantitative Balance**: Analyze the distribution of quantitative vs. qualitative criteria
+  - Warn if all criteria are qualitative (lacking measurable numbers)
+  - Warn if all criteria are purely technical (lacking user-focused outcomes)
+  - Recommend including both quantitative metrics and qualitative measures
+
+**Good quantitative criteria patterns to recognize:**
+
+- Time-based: "Users can complete X in under Y minutes/seconds"
+- Volume-based: "System handles N concurrent users/requests"
+- Percentage-based: "X% of users successfully complete Y on first attempt"
+- Rate-based: "Z operations per second/minute/hour"
+- Improvement-based: "Reduce X by Y%" (with baseline context)
+
 ### 5. Severity Assignment
 
 Use this heuristic to prioritize findings:
 
 - **CRITICAL**: Violates constitution MUST, missing core spec artifact, or requirement with zero coverage that blocks baseline functionality
-- **HIGH**: Duplicate or conflicting requirement, ambiguous security/performance attribute, untestable acceptance criterion
-- **MEDIUM**: Terminology drift, missing non-functional task coverage, underspecified edge case
-- **LOW**: Style/wording improvements, minor redundancy not affecting execution order
+- **HIGH**: Duplicate or conflicting requirement, ambiguous security/performance attribute, untestable acceptance criterion, success criteria with technology leakage or missing all quantitative metrics
+- **MEDIUM**: Terminology drift, missing non-functional task coverage, underspecified edge case, success criteria with vague measurements or unverifiable outcomes
+- **LOW**: Style/wording improvements, minor redundancy not affecting execution order, minor imbalance in quantitative vs. qualitative criteria
 
 ### 6. Produce Compact Analysis Report
 
@@ -129,9 +163,9 @@ Output a Markdown report (no file writes) with the following structure:
 
 ## Specification Analysis Report
 
-| ID | Category | Severity | Location(s) | Summary | Recommendation |
-|----|----------|----------|-------------|---------|----------------|
-| A1 | Duplication | HIGH | spec.md:L120-134 | Two similar requirements ... | Merge phrasing; keep clearer version |
+| ID | Category    | Severity | Location(s)          | Summary                                  | Recommendation                         |
+|----|-------------|----------|----------------------|------------------------------------------|----------------------------------------|
+| A1 | Duplication | HIGH     | spec.md:L120-134     | Two similar requirements ...             | Merge phrasing; keep clearer version   |
 
 (Add one row per finding; generate stable IDs prefixed by category initial.)
 
@@ -139,6 +173,11 @@ Output a Markdown report (no file writes) with the following structure:
 
 | Requirement Key | Has Task? | Task IDs | Notes |
 |-----------------|-----------|----------|-------|
+
+**Success Criteria Quality Analysis:**
+
+| Criterion ID | Has Quantitative Metric? | Technology-Agnostic? | User-Focused? | Issues |
+|--------------|--------------------------|----------------------|---------------|--------|
 
 **Constitution Alignment Issues:** (if any)
 
@@ -148,7 +187,13 @@ Output a Markdown report (no file writes) with the following structure:
 
 - Total Requirements
 - Total Tasks
+- Total Success Criteria
 - Coverage % (requirements with >=1 task)
+- Success Criteria Quality:
+  - Count with quantitative metrics
+  - Count with qualitative measures only
+  - Count with technology leakage
+  - Count with missing measurements
 - Ambiguity Count
 - Duplication Count
 - Critical Issues Count
