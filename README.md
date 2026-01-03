@@ -262,11 +262,11 @@ Essential commands for the Spec-Driven Development workflow:
 
 Additional commands for enhanced quality and validation:
 
-| Command              | Description                                                                                                                          |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `/speckit.clarify`   | Clarify underspecified areas (recommended before `/speckit.plan`; formerly `/quizme`)                                                |
-| `/speckit.analyze`   | Cross-artifact consistency & coverage analysis with quantitative metrics validation (run after `/speckit.tasks`, before `/speckit.implement`) |
-| `/speckit.checklist` | Generate custom quality checklists that validate requirements completeness, clarity, and consistency (like "unit tests for English") |
+| Command              | Description                                                                                                                                                       |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/speckit.clarify`   | Clarify underspecified areas (recommended before `/speckit.plan`; formerly `/quizme`)                                                                             |
+| `/speckit.analyze`   | Cross-artifact consistency & coverage analysis with quantitative metrics validation (run after `/speckit.tasks`, before `/speckit.implement`)                     |
+| `/speckit.checklist` | Generate custom quality checklists that validate requirements completeness, clarity, and consistency (like "unit tests for English")                              |
 
 ### Environment Variables
 
