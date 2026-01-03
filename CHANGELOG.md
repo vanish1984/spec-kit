@@ -7,6 +7,19 @@ All notable changes to the Specify CLI and templates are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Enhanced
+
+- **Quantitative Metrics Validation**: The `/speckit.analyze` command now includes comprehensive quantitative analysis for success criteria
+  - Validates that success criteria include specific quantitative metrics (time, performance, volume, percentages, counts)
+  - Detects vague terms lacking numeric thresholds ("fast", "quickly", "efficiently", "better performance")
+  - Identifies technology leakage in success criteria (API response times, database TPS, framework-specific measures)
+  - Flags unverifiable criteria lacking objective measurement methods
+  - Analyzes balance between quantitative and qualitative measures
+  - Provides detailed success criteria quality analysis table in reports
+  - Includes new metrics: total success criteria count, counts with quantitative metrics, technology leakage detection
+
 ## [0.0.22] - 2025-11-07
 
 - Support for VS Code/Copilot agents, and moving away from prompts to proper agents with hand-offs.
